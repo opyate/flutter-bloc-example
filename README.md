@@ -2,7 +2,10 @@
 
 Converting the default Flutter skeleton project to a BLoC-powered app.
 
-Some learnings:
+# Learnings
+
+## BLoC
+
 - BLoC's Cubits remind me of Riverpod (see [Note 1](#note-1)) in that it simplifies state management via direct state mutation via methods, with less boilerplate
 - Cubit's bigger sibling is Bloc, but instead of calling functions to mutate state, Bloc receives incoming events, which it converts into outgoing states via your business logic
 - Cubit and Bloc state changes can be centrally observed via a BlocObserver by setting Bloc.observer
@@ -13,6 +16,9 @@ Some learnings:
     - benefit from reactive extensions (e.g. `rxdart` (see [Note 3](#note-3)))
 - Cubit outputs are serial, whereas Bloc output is interleaved (see [Note 2](#note-2))  and this is due to the async nature of event streams
 
+## Flutter BLoC
+
+TODO
 
 # Notes
 
@@ -52,23 +58,27 @@ DoublerBloc()
 
 Showed this output (note how the Bloc output is interleaved):
 
-> I/flutter ( 3445): CounterCubit Change { currentState: 0, nextState: 1 }
-> I/flutter ( 3445): CounterCubit Change { currentState: 1, nextState: 2 }
-> I/flutter ( 3445): CounterCubit Change { currentState: 2, nextState: 3 }
-> I/flutter ( 3445): DoublerCubit Change { currentState: 0, nextState: 2 }
-> I/flutter ( 3445): DoublerCubit Change { currentState: 2, nextState: 4 }
-> I/flutter ( 3445): DoublerCubit Change { currentState: 4, nextState: 6 }
-> I/flutter ( 3445): CounterBloc Change { currentState: 0, nextState: 1 }
-> I/flutter ( 3445): DoublerBloc Change { currentState: 0, nextState: 2 }
-> I/flutter ( 3445): CounterBloc Change { currentState: 1, nextState: 2 }
-> I/flutter ( 3445): DoublerBloc Change { currentState: 2, nextState: 4 }
-> I/flutter ( 3445): CounterBloc Change { currentState: 2, nextState: 3 }
-> I/flutter ( 3445): DoublerBloc Change { currentState: 4, nextState: 6 }
+```
+I/flutter ( 3445): CounterCubit Change { currentState: 0, xtState: 1 }
+I/flutter ( 3445): CounterCubit Change { currentState: 1, xtState: 2 }
+I/flutter ( 3445): CounterCubit Change { currentState: 2, xtState: 3 }
+I/flutter ( 3445): DoublerCubit Change { currentState: 0, xtState: 2 }
+I/flutter ( 3445): DoublerCubit Change { currentState: 2, xtState: 4 }
+I/flutter ( 3445): DoublerCubit Change { currentState: 4, xtState: 6 }
+I/flutter ( 3445): CounterBloc Change { currentState: 0, xtState: 1 }
+I/flutter ( 3445): DoublerBloc Change { currentState: 0, xtState: 2 }
+I/flutter ( 3445): CounterBloc Change { currentState: 1, xtState: 2 }
+I/flutter ( 3445): DoublerBloc Change { currentState: 2, xtState: 4 }
+I/flutter ( 3445): CounterBloc Change { currentState: 2, xtState: 3 }
+I/flutter ( 3445): DoublerBloc Change { currentState: 4, nextState: 6 }
+```
 
 The `onEvent` outputs will be in quick succession, though, and the local `onEvent` is invoked before the global `onEvent` in BlocObserver.
 
-> (3) I/flutter ( 3445): CounterBloc Instance of 'CounterIncrementPressed'
-> (3) I/flutter ( 3445): DoublerBloc Instance of 'CounterIncrementPressed'
+```
+(3) I/flutter ( 3445): CounterBloc Instance of 'CounterIncrementPressed'
+(3) I/flutter ( 3445): DoublerBloc Instance of 'CounterIncrementPressed'
+```
 
 Explanation:
 
