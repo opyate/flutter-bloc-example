@@ -34,6 +34,12 @@ class SimpleBlocObserver extends BlocObserver {
     print('${bloc.runtimeType} $error $stackTrace');
     super.onError(bloc, error, stackTrace);
   }
+
+  @override
+  void onTransition(Bloc bloc, Transition transition) {
+    super.onTransition(bloc, transition);
+    print('${bloc.runtimeType} $transition');
+  }
 }
 
 void main() async {
@@ -50,9 +56,12 @@ void main() async {
   // SettingsView.
   runApp(MyApp(settingsController: settingsController));
 
+  // BLoC experiments below
+
+  Bloc.observer = SimpleBlocObserver();
+
   cubit_example:
   {
-    Bloc.observer = SimpleBlocObserver();
     CounterCubit()
       ..increment()
       ..increment()
@@ -68,27 +77,39 @@ void main() async {
 
   bloc_example:
   {
-    final bloc = CounterBloc();
-    // print(bloc.state); // 0
-    bloc.add(CounterIncrementPressed());
-    // await Future.delayed(Duration.zero);
-    // print(bloc.state); // 1
-    bloc.add(CounterIncrementPressed());
-    bloc.add(CounterIncrementPressed());
-    await bloc.close();
+    // final bloc = CounterBloc();
+    // // print(bloc.state); // 0
+    // bloc.add(CounterIncrementPressed());
+    // // await Future.delayed(Duration.zero);
+    // // print(bloc.state); // 1
+    // bloc.add(CounterIncrementPressed());
+    // bloc.add(CounterIncrementPressed());
+    // await bloc.close();
+
+    CounterBloc()
+      ..add(CounterIncrementPressed())
+      ..add(CounterIncrementPressed())
+      ..add(CounterIncrementPressed())
+      ..close();
   }
 
   stream_example:
   {
-    final bloc = DoublerBloc();
-    final subscription =
-        bloc.stream.listen((it) => print('streamListener> $it'));
-    bloc.add(CounterIncrementPressed());
-    bloc.add(CounterIncrementPressed());
-    bloc.add(CounterIncrementPressed());
-    await Future.delayed(Duration.zero);
-    await subscription.cancel();
-    await bloc.close();
+    // final bloc = DoublerBloc();
+    // final subscription =
+    //     bloc.stream.listen((it) => print('streamListener> $it'));
+    // bloc.add(CounterIncrementPressed());
+    // bloc.add(CounterIncrementPressed());
+    // bloc.add(CounterIncrementPressed());
+    // await Future.delayed(Duration.zero);
+    // await subscription.cancel();
+    // await bloc.close();
+
+    DoublerBloc()
+      ..add(CounterIncrementPressed())
+      ..add(CounterIncrementPressed())
+      ..add(CounterIncrementPressed())
+      ..close();
   }
 }
 
@@ -103,10 +124,22 @@ class CounterBloc extends Bloc<CounterEvent, int> {
     });
   }
 
+  // @override
+  // void onChange(Change<int> change) {
+  //   super.onChange(change);
+  //   print(change);
+  // }
+
   // Stream<int> mapEventToState(CounterEvent event) async* {
   //   if (event is CounterIncrementPressed) {
   //     yield state + 1;
   //   }
+  // }
+
+  // @override
+  // void onTransition(Transition<CounterEvent, int> transition) {
+  //   super.onTransition(transition);
+  //   print(transition);
   // }
 }
 
@@ -116,4 +149,16 @@ class DoublerBloc extends Bloc<CounterEvent, int> {
       emit(state + 2);
     });
   }
+
+  // @override
+  // void onChange(Change<int> change) {
+  //   super.onChange(change);
+  //   print(change);
+  // }
+
+  // @override
+  // void onTransition(Transition<CounterEvent, int> transition) {
+  //   super.onTransition(transition);
+  //   print(transition);
+  // }
 }

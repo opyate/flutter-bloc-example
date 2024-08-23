@@ -9,10 +9,62 @@ Some learnings:
 - Cubit and Bloc both extend BlocBase (which is the base type the BlocObserver accepts in its handlers)
 - Bloc advantages:
     - event sourcing (traceability)
+- Cubit outputs are serial, whereas Bloc output is interleaved (see [Note 2](#note-2))  and this is due to the async nature of event streams
 
 
-## Notes
+# Notes
 
-# Note 1
+## Note 1
 
 Riverpod is what [Andrea](https://codewithandrea.com/) used in our receipt scanner project for DunnHumby; I had the mobile app checked out and running on my computer too and sent a few PRs; likewise, Andrea learned about Firebase from me and incorporated it into his courses.
+
+## Note 2
+
+Calling this code:
+
+```
+CounterCubit()
+      ..increment()
+      ..increment()
+      ..increment()
+      ..close();
+
+DoublerCubit()
+    ..increment()
+    ..increment()
+    ..increment()
+    ..close();
+
+CounterBloc()
+    ..add(CounterIncrementPressed())
+    ..add(CounterIncrementPressed())
+    ..add(CounterIncrementPressed())
+    ..close();
+
+DoublerBloc()
+      ..add(CounterIncrementPressed())
+      ..add(CounterIncrementPressed())
+      ..add(CounterIncrementPressed())
+      ..close();
+```
+
+Showed this output (note how the Bloc output is interleaved):
+
+> I/flutter ( 3445): CounterCubit Change { currentState: 0, nextState: 1 }
+> I/flutter ( 3445): CounterCubit Change { currentState: 1, nextState: 2 }
+> I/flutter ( 3445): CounterCubit Change { currentState: 2, nextState: 3 }
+> I/flutter ( 3445): DoublerCubit Change { currentState: 0, nextState: 2 }
+> I/flutter ( 3445): DoublerCubit Change { currentState: 2, nextState: 4 }
+> I/flutter ( 3445): DoublerCubit Change { currentState: 4, nextState: 6 }
+> I/flutter ( 3445): CounterBloc Change { currentState: 0, nextState: 1 }
+> I/flutter ( 3445): DoublerBloc Change { currentState: 0, nextState: 2 }
+> I/flutter ( 3445): CounterBloc Change { currentState: 1, nextState: 2 }
+> I/flutter ( 3445): DoublerBloc Change { currentState: 2, nextState: 4 }
+> I/flutter ( 3445): CounterBloc Change { currentState: 2, nextState: 3 }
+> I/flutter ( 3445): DoublerBloc Change { currentState: 4, nextState: 6 }
+
+Explanation:
+
+Bloc: Built on top of streams, Blocs process events asynchronously. When you add multiple events in quick succession using the cascade operator (`..`), they are added to the Bloc's event queue. The Bloc then processes these events one by one, potentially leading to interleaved state updates if the processing of one event takes longer than the arrival of subsequent events.
+
+Cubit: While also capable of handling asynchronous operations, Cubits are designed to be simpler and more synchronous in nature. They directly mutate their state in response to method calls. When you use the cascade operator with a Cubit, the method calls are executed sequentially, resulting in serial state updates.
