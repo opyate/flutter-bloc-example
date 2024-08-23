@@ -1,29 +1,9 @@
 # flutter_default_skeleton_project
 
-A new Flutter project.
+Converting the default Flutter skeleton project to a BLoC-powered app.
 
-## Getting Started
-
-This project is a starting point for a Flutter application that follows the
-[simple app state management
-tutorial](https://flutter.dev/to/state-management-sample).
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
-## Assets
-
-The `assets` directory houses images, fonts, and any other files you want to
-include with your application.
-
-The `assets/images` directory contains [resolution-aware
-images](https://flutter.dev/to/resolution-aware-images).
-
-## Localization
-
-This project generates localized messages based on arb files found in
-the `lib/src/localization` directory.
-
-To support additional languages, please visit the tutorial on
-[Internationalizing Flutter apps](https://flutter.dev/to/internationalization).
+Some learnings:
+- BLoC's Cubits remind me of Riverpod (see note 1) in that it simplifies state management via direct state mutation via methods, with less boilerplate
+- Cubit's bigger sibling is Bloc, but instead of calling functions to mutate state, Bloc receives incoming events, which it converts into outgoing states via your business logic
+- Cubit and Bloc state changes can be centrally observed via a BlocObserver by setting Bloc.observer
+- Cubit and Bloc both extend BlocBase (which is the base type the BlocObserver accepts in its handlers)

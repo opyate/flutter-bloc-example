@@ -11,18 +11,15 @@ class CounterCubit extends Cubit<int> {
 
   void increment() {
     emit(state + 1);
-    // addError(Exception('increment error!'), StackTrace.current);
   }
+}
 
-  // @override
-  // void onChange(Change<int> change) {
-  //   super.onChange(change);
-  // }
+class DoublerCubit extends Cubit<int> {
+  DoublerCubit() : super(0);
 
-  // @override
-  // void onError(Object error, StackTrace stackTrace) {
-  //   super.onError(error, stackTrace);
-  // }
+  void increment() {
+    emit(state + 2);
+  }
 }
 
 class SimpleBlocObserver extends BlocObserver {
@@ -53,13 +50,46 @@ void main() async {
   // SettingsView.
   runApp(MyApp(settingsController: settingsController));
 
+  // Cubit examples
   Bloc.observer = SimpleBlocObserver();
   CounterCubit()
     ..increment()
     ..increment()
     ..increment()
+    ..close();
+
+  DoublerCubit()
     ..increment()
     ..increment()
     ..increment()
     ..close();
+
+  // Bloc examples
+  final bloc = CounterBloc();
+  // print(bloc.state); // 0
+  bloc.add(CounterIncrementPressed());
+  // await Future.delayed(Duration.zero);
+  // print(bloc.state); // 1
+  bloc.add(CounterIncrementPressed());
+  bloc.add(CounterIncrementPressed());
+  await bloc.close();
+}
+
+sealed class CounterEvent {}
+
+final class CounterIncrementPressed extends CounterEvent {}
+
+class CounterBloc extends Bloc<CounterEvent, int> {
+  CounterBloc() : super(0) {
+    on<CounterIncrementPressed>((event, emit) {
+      // handle incoming `CounterIncrementPressed` event
+      emit(state + 1);
+    });
+  }
+
+  // Stream<int> mapEventToState(CounterEvent event) async* {
+  //   if (event is CounterIncrementPressed) {
+  //     yield state + 1;
+  //   }
+  // }
 }
