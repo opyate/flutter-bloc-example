@@ -40,6 +40,12 @@ class SimpleBlocObserver extends BlocObserver {
     super.onTransition(bloc, transition);
     print('${bloc.runtimeType} $transition');
   }
+
+  @override
+  void onEvent(Bloc bloc, Object? event) {
+    super.onEvent(bloc, event);
+    print('${bloc.runtimeType} $event');
+  }
 }
 
 void main() async {
@@ -124,22 +130,10 @@ class CounterBloc extends Bloc<CounterEvent, int> {
     });
   }
 
-  // @override
-  // void onChange(Change<int> change) {
-  //   super.onChange(change);
-  //   print(change);
-  // }
-
   // Stream<int> mapEventToState(CounterEvent event) async* {
   //   if (event is CounterIncrementPressed) {
   //     yield state + 1;
   //   }
-  // }
-
-  // @override
-  // void onTransition(Transition<CounterEvent, int> transition) {
-  //   super.onTransition(transition);
-  //   print(transition);
   // }
 }
 
@@ -149,16 +143,4 @@ class DoublerBloc extends Bloc<CounterEvent, int> {
       emit(state + 2);
     });
   }
-
-  // @override
-  // void onChange(Change<int> change) {
-  //   super.onChange(change);
-  //   print(change);
-  // }
-
-  // @override
-  // void onTransition(Transition<CounterEvent, int> transition) {
-  //   super.onTransition(transition);
-  //   print(transition);
-  // }
 }

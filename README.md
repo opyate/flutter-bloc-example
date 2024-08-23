@@ -63,6 +63,11 @@ Showed this output (note how the Bloc output is interleaved):
 > I/flutter ( 3445): CounterBloc Change { currentState: 2, nextState: 3 }
 > I/flutter ( 3445): DoublerBloc Change { currentState: 4, nextState: 6 }
 
+The `onEvent` outputs will be in quick succession, though:
+
+> (3) I/flutter ( 3445): CounterBloc Instance of 'CounterIncrementPressed'
+> (3) I/flutter ( 3445): DoublerBloc Instance of 'CounterIncrementPressed'
+
 Explanation:
 
 Bloc: Built on top of streams, Blocs process events asynchronously. When you add multiple events in quick succession using the cascade operator (`..`), they are added to the Bloc's event queue. The Bloc then processes these events one by one, potentially leading to interleaved state updates if the processing of one event takes longer than the arrival of subsequent events.
