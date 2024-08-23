@@ -5,6 +5,7 @@ import 'src/settings/settings_controller.dart';
 import 'src/settings/settings_service.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rxdart/rxdart.dart'; // Import for debounce
 
 class CounterCubit extends Cubit<int> {
   CounterCubit() : super(0);
@@ -66,7 +67,7 @@ void main() async {
 
   Bloc.observer = SimpleBlocObserver();
 
-  cubit_example:
+  example_cubit:
   {
     CounterCubit()
       ..increment()
@@ -81,17 +82,9 @@ void main() async {
       ..close();
   }
 
-  bloc_example:
+  example_bloc:
   {
-    // final bloc = CounterBloc();
-    // // print(bloc.state); // 0
-    // bloc.add(CounterIncrementPressed());
-    // // await Future.delayed(Duration.zero);
-    // // print(bloc.state); // 1
-    // bloc.add(CounterIncrementPressed());
-    // bloc.add(CounterIncrementPressed());
-    // await bloc.close();
-
+    // this counter will be debounced
     CounterBloc()
       ..add(CounterIncrementPressed())
       ..add(CounterIncrementPressed())
@@ -99,7 +92,7 @@ void main() async {
       ..close();
   }
 
-  stream_example:
+  example_stream:
   {
     // final bloc = DoublerBloc();
     // final subscription =
@@ -117,6 +110,17 @@ void main() async {
       ..add(CounterIncrementPressed())
       ..close();
   }
+
+  example_sidestep_debounce_with_delays:
+  {
+    final bloc = CounterBloc();
+    bloc.add(CounterIncrementPressed());
+    await Future.delayed(const Duration(milliseconds: 301));
+    bloc.add(CounterIncrementPressed());
+    await Future.delayed(const Duration(milliseconds: 301));
+    bloc.add(CounterIncrementPressed());
+    await bloc.close();
+  }
 }
 
 sealed class CounterEvent {}
@@ -125,9 +129,10 @@ final class CounterIncrementPressed extends CounterEvent {}
 
 class CounterBloc extends Bloc<CounterEvent, int> {
   CounterBloc() : super(0) {
-    on<CounterIncrementPressed>((event, emit) {
-      emit(state + 1);
-    });
+    on<CounterIncrementPressed>(
+      (event, emit) => emit(state + 1),
+      transformer: debounce(const Duration(milliseconds: 300)),
+    );
   }
 
   // Stream<int> mapEventToState(CounterEvent event) async* {
@@ -135,6 +140,10 @@ class CounterBloc extends Bloc<CounterEvent, int> {
   //     yield state + 1;
   //   }
   // }
+
+  EventTransformer<T> debounce<T>(Duration duration) {
+    return (events, mapper) => events.debounceTime(duration).flatMap(mapper);
+  }
 }
 
 class DoublerBloc extends Bloc<CounterEvent, int> {
