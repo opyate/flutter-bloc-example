@@ -50,29 +50,46 @@ void main() async {
   // SettingsView.
   runApp(MyApp(settingsController: settingsController));
 
-  // Cubit examples
-  Bloc.observer = SimpleBlocObserver();
-  CounterCubit()
-    ..increment()
-    ..increment()
-    ..increment()
-    ..close();
+  cubit_example:
+  {
+    Bloc.observer = SimpleBlocObserver();
+    CounterCubit()
+      ..increment()
+      ..increment()
+      ..increment()
+      ..close();
 
-  DoublerCubit()
-    ..increment()
-    ..increment()
-    ..increment()
-    ..close();
+    DoublerCubit()
+      ..increment()
+      ..increment()
+      ..increment()
+      ..close();
+  }
 
-  // Bloc examples
-  final bloc = CounterBloc();
-  // print(bloc.state); // 0
-  bloc.add(CounterIncrementPressed());
-  // await Future.delayed(Duration.zero);
-  // print(bloc.state); // 1
-  bloc.add(CounterIncrementPressed());
-  bloc.add(CounterIncrementPressed());
-  await bloc.close();
+  bloc_example:
+  {
+    final bloc = CounterBloc();
+    // print(bloc.state); // 0
+    bloc.add(CounterIncrementPressed());
+    // await Future.delayed(Duration.zero);
+    // print(bloc.state); // 1
+    bloc.add(CounterIncrementPressed());
+    bloc.add(CounterIncrementPressed());
+    await bloc.close();
+  }
+
+  stream_example:
+  {
+    final bloc = DoublerBloc();
+    final subscription =
+        bloc.stream.listen((it) => print('streamListener> $it'));
+    bloc.add(CounterIncrementPressed());
+    bloc.add(CounterIncrementPressed());
+    bloc.add(CounterIncrementPressed());
+    await Future.delayed(Duration.zero);
+    await subscription.cancel();
+    await bloc.close();
+  }
 }
 
 sealed class CounterEvent {}
@@ -82,7 +99,6 @@ final class CounterIncrementPressed extends CounterEvent {}
 class CounterBloc extends Bloc<CounterEvent, int> {
   CounterBloc() : super(0) {
     on<CounterIncrementPressed>((event, emit) {
-      // handle incoming `CounterIncrementPressed` event
       emit(state + 1);
     });
   }
@@ -92,4 +108,12 @@ class CounterBloc extends Bloc<CounterEvent, int> {
   //     yield state + 1;
   //   }
   // }
+}
+
+class DoublerBloc extends Bloc<CounterEvent, int> {
+  DoublerBloc() : super(0) {
+    on<CounterIncrementPressed>((event, emit) {
+      emit(state + 2);
+    });
+  }
 }
